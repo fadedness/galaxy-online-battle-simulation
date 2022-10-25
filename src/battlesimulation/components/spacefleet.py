@@ -144,7 +144,7 @@ class SpaceFleet(_BasicGameEntityArray):
             or an already instantiated spaceship.
 
             Default ids: 1 - Hercules, 2 - Loki, 3 - Raptor, 4 - Hornet, 5 - Javelin,
-            6 - Excalibur, 7 - Valkirie, 8 - Titan, 9 - Abaddon.
+            6 - Excalibur, 7 - Valkyrie, 8 - Titan, 9 - Abaddon.
         """
 
         return self.set_item_of_array(spaceship)
