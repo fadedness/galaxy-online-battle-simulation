@@ -5,6 +5,14 @@ from typing import Union
 import battlesimulation
 from battlesimulation import Context, SpaceFleet, Rocket
 
+clear_command = 'cls' if os.name == 'nt' else 'clear'
+previous_results_string = ""
+clear_screen_flag = True
+c = Context()
+c._fleet_1.custom_name = "Fleet 1"
+c._fleet_2.custom_name = "Fleet 2"
+c._fleet_3.custom_name = "Fleet 3"
+
 def clear_screen() -> None:
     """Clear command line and print previous saved results string."""
 
@@ -525,18 +533,7 @@ def main() -> None:
     manage_main_menu()
 
 if __name__ == "__main__":
-    clear_command = 'cls' if os.name == 'nt' else 'clear'
-    previous_results_string = ""
-    clear_screen_flag = True
     if "--help" in sys.argv[1:] or "-h" in sys.argv[1:]:
         print_help()
         sys.exit(0)
-    c = Context()
-    #print(c._fleet_1.attacking)
-    #print(c._fleet_2.attacking)
-    #print(c._fleet_3.attacking)
-    #input("...")
-    c._fleet_1.custom_name = "Fleet 1"
-    c._fleet_2.custom_name = "Fleet 2"
-    c._fleet_3.custom_name = "Fleet 3"
     main()
