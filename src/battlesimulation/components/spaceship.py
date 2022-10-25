@@ -34,7 +34,7 @@ class Spaceship(_BasicGameEntity):
         """New instance of Spaceship class.
 
             Default ids: 1 - Hercules, 2 - Loki, 3 - Raptor, 4 - Hornet, 5 - Javelin,
-            6 - Excalibur, 7 - Valkirie, 8 - Titan, 9 - Abaddon.
+            6 - Excalibur, 7 - Valkyrie, 8 - Titan, 9 - Abaddon.
         """
 
         super().__init__(id, quantity, battlesimulation._GGP.types_spaceship, Spaceship, 6)
@@ -214,7 +214,7 @@ class Excalibur(Spaceship):
     def __init__(self, quantity: Union[int,float] = 0) -> None:
         super().__init__(6, quantity)
 
-class Valkirie(Spaceship):
+class Valkyrie(Spaceship):
     def __init__(self, quantity: Union[int,float] = 0) -> None:
         super().__init__(7, quantity)
 
