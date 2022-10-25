@@ -5,24 +5,21 @@ This module was made for simulation of different battles in the online space str
 
 You can use this module to analize your possibilities, casualties, costs, etc; you can find possible good counters to incoming attacks on you.
 
-TODO
-
-there will be, currently that GUI uses built in calculations, that I'm gonna replace with this module.
-
-There is a GUI wrapper for this module: https://github.com/fadedness/Galaxy-Online-Battle-Calculator
+There is a GUI version of Game Calculator: https://github.com/fadedness/Galaxy-Online-Battle-Calculator
 and you would probably prefer it over text command line.
 
-# install and usage
-TODO
+But as of 2022/10/25 it uses built in methods of calculations and I'm gonna change that to use this new module instead.
 
-it will be uploaded to PyPi and it will be installable via
+# install and usage
 ```
 python -m pip install galaxy-online-battle-simulation
 ```
 
-To use it either run python battlesimulation for interactive mode with menu
+To use it either run python -m battlesimulation for interactive mode with menu
 or import it in your script and use Context class:
-
+```
+python -m battlesimulation
+```
 ```
 from battlesimulation import Context
 context = Context()
@@ -192,6 +189,20 @@ Once again:
 context.help_game_parameters()
 ```
 Or use Game guides on website.
+
+# Game data
+There is a file data.json in this repo. It is not used by module, it is left for reference and for advanced usage.
+
+All data is hardcoded in components/config.py.
+
+But instead of editing config.py, one can edit that data.json, load it via json and pass to:
+```
+import json
+with open("/path/to/data.json", "r") as f:
+	loaded_data = json.load(f)
+battlesimulation.load_global_game_parameters(loaded_data)
+```
+If the data is valid it will be loaded and used in this module.
 
 # Conclusion
 There are many things you can set and do, but I'm not going to document it here, sorry.
