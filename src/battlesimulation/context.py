@@ -285,7 +285,7 @@ class Context():
             N.B. Spaceships quantity when battle is simulated will become float.
 
             Default ids: 1 - Hercules, 2 - Loki, 3 - Raptor, 4 - Hornet, 5 - Javelin,
-            6 - Excalibur, 7 - Valkirie, 8 - Titan, 9 - Abaddon.
+            6 - Excalibur, 7 - Valkyrie, 8 - Titan, 9 - Abaddon.
 
             Pass an empty list to clear all Spaceships.
         """
@@ -303,7 +303,7 @@ class Context():
             N.B. Spaceships quantity when battle is simulated will become float.
 
             Default ids: 1 - Hercules, 2 - Loki, 3 - Raptor, 4 - Hornet, 5 - Javelin,
-            6 - Excalibur, 7 - Valkirie, 8 - Titan, 9 - Abaddon.
+            6 - Excalibur, 7 - Valkyrie, 8 - Titan, 9 - Abaddon.
 
             Pass an empty list to clear all Spaceships.
         """
@@ -321,7 +321,7 @@ class Context():
             N.B. Spaceships quantity when battle is simulated will become float.
 
             Default ids: 1 - Hercules, 2 - Loki, 3 - Raptor, 4 - Hornet, 5 - Javelin,
-            6 - Excalibur, 7 - Valkirie, 8 - Titan, 9 - Abaddon.
+            6 - Excalibur, 7 - Valkyrie, 8 - Titan, 9 - Abaddon.
 
             Pass an empty list to clear all Spaceships.
         """
@@ -414,8 +414,8 @@ class Context():
         if (isinstance(quantity, int) or isinstance(quantity, float)) and quantity >= 0:
             return self.add_spaceship_to_fleet_1((6,quantity))
 
-    def add_valkirie_to_fleet_1(self, quantity: Union[int,float]) -> bool:
-        """Add Valkirie Spaceship to Fleet 1"""
+    def add_valkyrie_to_fleet_1(self, quantity: Union[int,float]) -> bool:
+        """Add Valkyrie Spaceship to Fleet 1"""
 
         if (isinstance(quantity, int) or isinstance(quantity, float)) and quantity >= 0:
             return self.add_spaceship_to_fleet_1((7,quantity))
@@ -468,8 +468,8 @@ class Context():
         if (isinstance(quantity, int) or isinstance(quantity, float)) and quantity >= 0:
             return self.add_spaceship_to_fleet_2((6,quantity))
 
-    def add_valkirie_to_fleet_2(self, quantity: Union[int,float]) -> bool:
-        """Add Valkirie Spaceship to Fleet 2"""
+    def add_valkyrie_to_fleet_2(self, quantity: Union[int,float]) -> bool:
+        """Add Valkyrie Spaceship to Fleet 2"""
 
         if (isinstance(quantity, int) or isinstance(quantity, float)) and quantity >= 0:
             return self.add_spaceship_to_fleet_2((7,quantity))
@@ -522,8 +522,8 @@ class Context():
         if (isinstance(quantity, int) or isinstance(quantity, float)) and quantity >= 0:
             return self.add_spaceship_to_fleet_3((6,quantity))
 
-    def add_valkirie_to_fleet_3(self, quantity: Union[int,float]) -> bool:
-        """Add Valkirie Spaceship to Fleet 3"""
+    def add_valkyrie_to_fleet_3(self, quantity: Union[int,float]) -> bool:
+        """Add Valkyrie Spaceship to Fleet 3"""
 
         if (isinstance(quantity, int) or isinstance(quantity, float)) and quantity >= 0:
             return self.add_spaceship_to_fleet_3((7,quantity))
@@ -1375,7 +1375,7 @@ class Context():
         # else (Fleet 1 is attacking the Planet):
         #     1. Fleet 1 vs Fleet 3 - blockading Fleet 3 will fight with Fleet 1 (doesn't matter if Fleet 1 is attacking or blockading)
         #     2. Fleet 1 vs Turrets -> Turrets fire passive damage before Rockets
-        #     3. Fleet 1 vs Rockets (Cobra, Aurora and X-Ray (only against Valkiries))
+        #     3. Fleet 1 vs Rockets (Cobra, Aurora and X-Ray (only against Valkyries))
         #     4. Fleet 1 vs Fleet 2
         # The End.
 
@@ -1455,7 +1455,7 @@ class Context():
         return
 
     def old_simulate_bombardment(self) -> str:
-        """Old Bombardment Mechanic, prints and returns text of numbers of Valkiries needed to destroy Planetary Defense.
+        """Old Bombardment Mechanic, prints and returns text of numbers of Valkyries needed to destroy Planetary Defense.
 
             First you need to set Fleet 1 Module, then set Planet with buildings and rockets. Call this func and results will be printed.
             And saved in _results_for_old_bombardment (dict).
@@ -1471,11 +1471,11 @@ class Context():
         text = ""
         text += "\n\nOld Bombardment Calculations.\n"
         text += f"{self._planet.filtered_str_full}\n"
-        text += f"Valkiries needed to destroy Shield Generator in one go: {self._results_for_old_bombardment['needed_for_shield']}\n"
-        text += f"Valkiries destroyed after attack on the Shield Generator: {self._results_for_old_bombardment['dead_for_shield']}\n\n"
-        text += f"Valkiries needed to destroy Turrets in one go and not touch other buildings: {self._results_for_old_bombardment['needed_for_turrets']}\n"
-        text += f"Valkiries destroyed after attack on the Turrets: {self._results_for_old_bombardment['dead_for_turrets']}\n\n"
-        text += f"Valkiries needed to destroy all other buildings (limit: only down to level 2) in one go: {self._results_for_old_bombardment['needed_for_buildings']}\n\n"
+        text += f"Valkyries needed to destroy Shield Generator in one go: {self._results_for_old_bombardment['needed_for_shield']}\n"
+        text += f"Valkyries destroyed after attack on the Shield Generator: {self._results_for_old_bombardment['dead_for_shield']}\n\n"
+        text += f"Valkyries needed to destroy Turrets in one go and not touch other buildings: {self._results_for_old_bombardment['needed_for_turrets']}\n"
+        text += f"Valkyries destroyed after attack on the Turrets: {self._results_for_old_bombardment['dead_for_turrets']}\n\n"
+        text += f"Valkyries needed to destroy all other buildings (limit: only down to level 2) in one go: {self._results_for_old_bombardment['needed_for_buildings']}\n\n"
         print(text)
         return text
 
