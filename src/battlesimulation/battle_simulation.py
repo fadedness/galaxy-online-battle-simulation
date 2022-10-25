@@ -996,10 +996,10 @@ class BattleSimulation():
 
         if isinstance(spaceship_module, ModuleAndBonuses) and isinstance(planet, Planet) and \
                 isinstance(planet.rockets, RocketArray) and isinstance(planet.buildings, BuildingArray):
-            # calculate Valkiries needed to pass Turrets and Rockets
+            # calculate Valkyries needed to pass Turrets and Rockets
             spaceship_module.calc_final_damage_mods(1.0)
-            valkirie_dead_by_turrets = self._find_number_of_spaceships_to_absord_turrets_damage(7, spaceship_module, planet)
-            valkirie_dead_by_rockets = self._find_number_of_spaceships_to_neutralize_rockets(7, spaceship_module, \
+            valkyrie_dead_by_turrets = self._find_number_of_spaceships_to_absord_turrets_damage(7, spaceship_module, planet)
+            valkyrie_dead_by_rockets = self._find_number_of_spaceships_to_neutralize_rockets(7, spaceship_module, \
                     planet.rockets.make_a_copy_of_self(), full_attack=True)
 
             shield_generator_defenses = 0
@@ -1016,8 +1016,8 @@ class BattleSimulation():
                     else:
                         the_rest_buildings_defenses += building.level * building.defense
             debug_print(f"\nPlanet's structured defenses: Shield Generator={shield_generator_defenses}, Turrets={turrets_defenses}, the rest={the_rest_buildings_defenses}\n")
-            debug_print(f"{valkirie_dead_by_turrets=}, {valkirie_dead_by_rockets=}\n")
-            result = {"valkirie_dead_by_turrets": valkirie_dead_by_turrets, "valkirie_dead_by_rockets": valkirie_dead_by_rockets, \
+            debug_print(f"{valkyrie_dead_by_turrets=}, {valkyrie_dead_by_rockets=}\n")
+            result = {"valkyrie_dead_by_turrets": valkyrie_dead_by_turrets, "valkyrie_dead_by_rockets": valkyrie_dead_by_rockets, \
                     "shield_generator_defenses": shield_generator_defenses, "turrets_defenses": turrets_defenses, \
                     "the_rest_buildings_defenses": the_rest_buildings_defenses, "shield_level": shield_level}
             return result
@@ -1345,35 +1345,35 @@ class BattleSimulation():
 
         return result
 
-    def old_bombardment_calculate_valkiries_for_shield_generator(self, spaceship_module: ModuleAndBonuses, planet: Planet, \
-            valkirie_dead_by_turrets: float, valkirie_dead_by_rockets: float, \
+    def old_bombardment_calculate_valkyries_for_shield_generator(self, spaceship_module: ModuleAndBonuses, planet: Planet, \
+            valkyrie_dead_by_turrets: float, valkyrie_dead_by_rockets: float, \
             shield_level: int) -> tuple:
         """This func is for old Bombardment mechanic, it returns a tuple of 4 item.
 
-            It calculates the number of Valkiries needed to destroy Shield Generator.
-            When one level of Shield Generator is destroyed, the Shield does EMP damage back to Valkiries.
+            It calculates the number of Valkyries needed to destroy Shield Generator.
+            When one level of Shield Generator is destroyed, the Shield does EMP damage back to Valkyries.
 
-            returns: item1 = number of Valkiries needed to fully destroy Shield Generator on the Planet in one go;
-            item2 = number of Valkiries that will be destroyed during the attack;
+            returns: item1 = number of Valkyries needed to fully destroy Shield Generator on the Planet in one go;
+            item2 = number of Valkyries that will be destroyed during the attack;
 
-            item3 = a list of Valkiries needed to destroy a particular level of Shield Generator
-            (includes the amount of Valkiries that will be destroyed before the Bombardment will start
+            item3 = a list of Valkyries needed to destroy a particular level of Shield Generator
+            (includes the amount of Valkyries that will be destroyed before the Bombardment will start
             (destroyed by turrets, and rockets only for the initial shield level)),
             index is reversed level of Shield Generator, index 0 - level 30, 1 - level 29, ... , 29 - level 1;
 
-            item4 = is the same as item3 except that numbers are the Valkiries that will be destroyed by that particular level of Shield Generator.
+            item4 = is the same as item3 except that numbers are the Valkyries that will be destroyed by that particular level of Shield Generator.
         """
 
         if isinstance(spaceship_module, ModuleAndBonuses) and isinstance(planet, Planet) and \
                 isinstance(planet.buildings, BuildingArray) and isinstance(shield_level, int) and \
                 0 <= shield_level <= battlesimulation._GGP.globals["max_building_level"] and \
-                isinstance(valkirie_dead_by_turrets, float) and isinstance(valkirie_dead_by_rockets, float) and \
-                valkirie_dead_by_turrets >= 0 and valkirie_dead_by_rockets >= 0:
-            if valkirie_dead_by_turrets + valkirie_dead_by_rockets >= 1:
-                left_over_valkiries = (valkirie_dead_by_turrets + valkirie_dead_by_rockets) % int(valkirie_dead_by_turrets + valkirie_dead_by_rockets)
+                isinstance(valkyrie_dead_by_turrets, float) and isinstance(valkyrie_dead_by_rockets, float) and \
+                valkyrie_dead_by_turrets >= 0 and valkyrie_dead_by_rockets >= 0:
+            if valkyrie_dead_by_turrets + valkyrie_dead_by_rockets >= 1:
+                left_over_valkyries = (valkyrie_dead_by_turrets + valkyrie_dead_by_rockets) % int(valkyrie_dead_by_turrets + valkyrie_dead_by_rockets)
             else:
-                left_over_valkiries = valkirie_dead_by_turrets + valkirie_dead_by_rockets
-            valkirie = Spaceship(7,1)
+                left_over_valkyries = valkyrie_dead_by_turrets + valkyrie_dead_by_rockets
+            valkyrie = Spaceship(7,1)
             shield_damage_type_id = planet.shield_damage_type_id
             # no Superiority mechanic in bombardment
             spaceship_module.calc_final_damage_mods(1.0)
@@ -1395,34 +1395,34 @@ class BattleSimulation():
                 dmg_to_do = _my_truncate((all_defenses * shield_max_coef), 6)
                 # but probably I'll skip this kind of fine-tuning
                 if i == -1:
-                    # if there is a "part" of Valkirie spaceship after Turrets and Rockets (Spaceship's quantity is float until the end of Battle)
+                    # if there is a "part" of Valkyrie spaceship after Turrets and Rockets (Spaceship's quantity is float until the end of Battle)
                     # then it too does damage, so we subtract that from damage_to_do
                     # But only for the initial (upper) level
-                    damage_to_do -= left_over_valkiries * valkirie.attack * spaceship_module.final_attack_damage_mods[valkirie.damage_type_id]
+                    damage_to_do -= left_over_valkyries * valkyrie.attack * spaceship_module.final_attack_damage_mods[valkyrie.damage_type_id]
                 damage_to_do.append(dmg_to_do)
                 damage_to_do_sum += dmg_to_do
-                valkyr_needed.append(_my_truncate(dmg_to_do / (valkirie.attack * spaceship_module.final_attack_damage_mods[valkirie.damage_type_id]),6))
-                valkyr_dead.append(_my_truncate(dmg_to_do / (valkirie.defenses[shield_damage_type_id] * spaceship_module.final_no_superiority_defense_damage_mods[shield_damage_type_id]),6))
+                valkyr_needed.append(_my_truncate(dmg_to_do / (valkyrie.attack * spaceship_module.final_attack_damage_mods[valkyrie.damage_type_id]),6))
+                valkyr_dead.append(_my_truncate(dmg_to_do / (valkyrie.defenses[shield_damage_type_id] * spaceship_module.final_no_superiority_defense_damage_mods[shield_damage_type_id]),6))
                 debug_print(f"{damage_to_do[i]=}, {valkyr_needed[i+j]=}, {valkyr_dead[i+j]=}\n")
                 shield_lvl_now -= 1
             
             valkyr_needed_final = sum(valkyr_needed)
             valkyr_dead_final = sum(valkyr_dead)
             # 
-            valkyr_dead_final += valkirie_dead_by_turrets + valkirie_dead_by_rockets
-            valkyr_needed_final += valkirie_dead_by_turrets + valkirie_dead_by_rockets
+            valkyr_dead_final += valkyrie_dead_by_turrets + valkyrie_dead_by_rockets
+            valkyr_needed_final += valkyrie_dead_by_turrets + valkyrie_dead_by_rockets
             
             text = "\n"
             shield_lvl_now = shield_level
             for i in range(shield_level):
                 if i == 0:
                     # at the time of attack on the initial level of S.G. Rockets are ready to fire (and they do)
-                    valkyr_dead[i + j] += valkirie_dead_by_turrets + valkirie_dead_by_rockets
-                    valkyr_needed[i + j] += valkirie_dead_by_turrets + valkirie_dead_by_rockets
+                    valkyr_dead[i + j] += valkyrie_dead_by_turrets + valkyrie_dead_by_rockets
+                    valkyr_needed[i + j] += valkyrie_dead_by_turrets + valkyrie_dead_by_rockets
                 else:
                     # no more Rockets after
-                    valkyr_dead[i + j] += valkirie_dead_by_turrets
-                    valkyr_needed[i + j] += valkirie_dead_by_turrets
+                    valkyr_dead[i + j] += valkyrie_dead_by_turrets
+                    valkyr_needed[i + j] += valkyrie_dead_by_turrets
                 text += f"Shield level {shield_lvl_now}\nDamage needed {damage_to_do[i]}\nValkyr needed {valkyr_needed[i + j]}\nValkyr will die {valkyr_dead[i + j]}\n\n"
                 shield_lvl_now -= 1
             text += "\n"
@@ -1437,68 +1437,68 @@ class BattleSimulation():
             
             return (valkyr_needed_final, valkyr_dead_final, tuple(valkyr_needed), tuple(valkyr_dead))
 
-    def old_bombardment_calculate_valkiries_for_turrets(self, spaceship_module: ModuleAndBonuses, \
-            valkirie_dead_by_turrets: float, valkirie_dead_by_rockets: float, \
+    def old_bombardment_calculate_valkyries_for_turrets(self, spaceship_module: ModuleAndBonuses, \
+            valkyrie_dead_by_turrets: float, valkyrie_dead_by_rockets: float, \
             turrets_defenses: int, shield_level: int) -> tuple:
         """This func is for old Bombardment mechanic, it returns a tuple.
 
-            returns: tuple = (valkiries_needed_to_destroy_turrets, valkiries_destroyed_for_turrets)
-            It calculates the number of Valkiries needed to destroy all Turrets and not touch other buildings.
+            returns: tuple = (valkyries_needed_to_destroy_turrets, valkyries_destroyed_for_turrets)
+            It calculates the number of Valkyries needed to destroy all Turrets and not touch other buildings.
         """
 
-        valkirie_needed_for_turrets = 0
+        valkyrie_needed_for_turrets = 0
         if isinstance(spaceship_module, ModuleAndBonuses) and \
-                isinstance(valkirie_dead_by_turrets, float) and isinstance(valkirie_dead_by_rockets, float) and \
-                valkirie_dead_by_turrets >= 0 and valkirie_dead_by_rockets >= 0 and isinstance(shield_level, int) and \
+                isinstance(valkyrie_dead_by_turrets, float) and isinstance(valkyrie_dead_by_rockets, float) and \
+                valkyrie_dead_by_turrets >= 0 and valkyrie_dead_by_rockets >= 0 and isinstance(shield_level, int) and \
                 0 <= shield_level <= battlesimulation._GGP.globals["max_building_level"] and \
                 isinstance(turrets_defenses, int) and turrets_defenses >= 0:
             if turrets_defenses == 0:
                 return (0, 0)
             if shield_level == 0:
-                valkirie_destroyed_for_turrets = int(_my_round_threshold_down(valkirie_dead_by_turrets + valkirie_dead_by_rockets, 0, battlesimulation._GGP.threshold))
-                if valkirie_dead_by_turrets + valkirie_dead_by_rockets >= 1:
-                    left_over_valkiries = (valkirie_dead_by_turrets + valkirie_dead_by_rockets) % int(valkirie_dead_by_turrets + valkirie_dead_by_rockets)
+                valkyrie_destroyed_for_turrets = int(_my_round_threshold_down(valkyrie_dead_by_turrets + valkyrie_dead_by_rockets, 0, battlesimulation._GGP.threshold))
+                if valkyrie_dead_by_turrets + valkyrie_dead_by_rockets >= 1:
+                    left_over_valkyries = (valkyrie_dead_by_turrets + valkyrie_dead_by_rockets) % int(valkyrie_dead_by_turrets + valkyrie_dead_by_rockets)
                 else:
-                    left_over_valkiries = valkirie_dead_by_turrets + valkirie_dead_by_rockets
+                    left_over_valkyries = valkyrie_dead_by_turrets + valkyrie_dead_by_rockets
             else:
-                valkirie_destroyed_for_turrets = int(_my_round_threshold_down(valkirie_dead_by_turrets, 0, battlesimulation._GGP.threshold))
-                if valkirie_dead_by_turrets >= 1:
-                    left_over_valkiries = (valkirie_dead_by_turrets) % int(valkirie_dead_by_turrets)
+                valkyrie_destroyed_for_turrets = int(_my_round_threshold_down(valkyrie_dead_by_turrets, 0, battlesimulation._GGP.threshold))
+                if valkyrie_dead_by_turrets >= 1:
+                    left_over_valkyries = (valkyrie_dead_by_turrets) % int(valkyrie_dead_by_turrets)
                 else:
-                    left_over_valkiries = valkirie_dead_by_turrets
-            left_over_valkiries = _my_truncate(1 - left_over_valkiries, 6)
-            valkirie = Spaceship(7,1)
+                    left_over_valkyries = valkyrie_dead_by_turrets
+            left_over_valkyries = _my_truncate(1 - left_over_valkyries, 6)
+            valkyrie = Spaceship(7,1)
             # no Superiority mechanic in bombardment
             spaceship_module.calc_final_damage_mods(1.0)
-            # if there is a "part" of Valkirie spaceship after Turrets and Rockets (Spaceship's quantity is float until the end of Battle)
+            # if there is a "part" of Valkyrie spaceship after Turrets and Rockets (Spaceship's quantity is float until the end of Battle)
             # then it too does damage, so we subtract that damage from turret_defenses
-            turrets_defenses -= left_over_valkiries * valkirie.attack * spaceship_module.final_attack_damage_mods[valkirie.damage_type_id]
-            valkirie_needed_for_turrets = turrets_defenses / (valkirie.attack * spaceship_module.final_attack_damage_mods[valkirie.damage_type_id])
-            valkirie_needed_for_turrets += valkirie_dead_by_turrets
+            turrets_defenses -= left_over_valkyries * valkyrie.attack * spaceship_module.final_attack_damage_mods[valkyrie.damage_type_id]
+            valkyrie_needed_for_turrets = turrets_defenses / (valkyrie.attack * spaceship_module.final_attack_damage_mods[valkyrie.damage_type_id])
+            valkyrie_needed_for_turrets += valkyrie_dead_by_turrets
             # if the initial Shield Generator level is 0, then there was no separate attack on it and the Rockets are intact
             # N.B although the Player should destroy rockets (except X-Rays) before making a Bombardment
             if shield_level == 0:
-                valkirie_needed_for_turrets += valkirie_dead_by_rockets
-            valkirie_needed_for_turrets = _my_round_up(valkirie_needed_for_turrets)
-            debug_print(f"{valkirie_needed_for_turrets=}")
-        return (valkirie_needed_for_turrets, valkirie_destroyed_for_turrets)
+                valkyrie_needed_for_turrets += valkyrie_dead_by_rockets
+            valkyrie_needed_for_turrets = _my_round_up(valkyrie_needed_for_turrets)
+            debug_print(f"{valkyrie_needed_for_turrets=}")
+        return (valkyrie_needed_for_turrets, valkyrie_destroyed_for_turrets)
 
-    def old_bombardment_calculate_valkiries_for_the_rest_of_buildings(self, spaceship_module: ModuleAndBonuses, the_rest_buildings_defenses: int) -> int:
-        """This func is for old Bombardment mechanic, it returns an amount of Valkiries needed to destroy all other buildings."""
+    def old_bombardment_calculate_valkyries_for_the_rest_of_buildings(self, spaceship_module: ModuleAndBonuses, the_rest_buildings_defenses: int) -> int:
+        """This func is for old Bombardment mechanic, it returns an amount of Valkyries needed to destroy all other buildings."""
 
-        valkiries_needed_for_buildings = 0
+        valkyries_needed_for_buildings = 0
         if isinstance(spaceship_module, ModuleAndBonuses) and \
                 isinstance(the_rest_buildings_defenses, int) and the_rest_buildings_defenses >= 0:
-            valkirie = Spaceship(7,1)
+            valkyrie = Spaceship(7,1)
             # no Superiority mechanic in bombardment
             spaceship_module.calc_final_damage_mods(1.0)
-            valkiries_needed_for_buildings = the_rest_buildings_defenses / (valkirie.attack * spaceship_module.final_attack_damage_mods[valkirie.damage_type_id])
-            valkiries_needed_for_buildings = _my_round_up(valkiries_needed_for_buildings)
-            debug_print(f"{valkiries_needed_for_buildings=}")
-        return valkiries_needed_for_buildings
+            valkyries_needed_for_buildings = the_rest_buildings_defenses / (valkyrie.attack * spaceship_module.final_attack_damage_mods[valkyrie.damage_type_id])
+            valkyries_needed_for_buildings = _my_round_up(valkyries_needed_for_buildings)
+            debug_print(f"{valkyries_needed_for_buildings=}")
+        return valkyries_needed_for_buildings
 
     def old_simulate_bombardment(self, spaceship_module: ModuleAndBonuses, planet: Planet) -> dict:
-        """Old Bombardment Mechanic, returns dict of numbers of Valkiries needed to destroy Planetary Defense.
+        """Old Bombardment Mechanic, returns dict of numbers of Valkyries needed to destroy Planetary Defense.
 
             This game mechanic is still in effect on live (main) Game Galaxies, but it's going to change.
 
@@ -1512,18 +1512,18 @@ class BattleSimulation():
                 isinstance(planet.rockets, RocketArray) and isinstance(planet.buildings, BuildingArray):
             planetary_defenses = self._get_basic_vars_for_old_bombardment(spaceship_module, planet.make_a_copy_of_self())
             if isinstance(planetary_defenses, dict):
-                valkirie_dead_by_turrets = planetary_defenses["valkirie_dead_by_turrets"]
-                valkirie_dead_by_rockets = planetary_defenses["valkirie_dead_by_rockets"]
+                valkyrie_dead_by_turrets = planetary_defenses["valkyrie_dead_by_turrets"]
+                valkyrie_dead_by_rockets = planetary_defenses["valkyrie_dead_by_rockets"]
                 shield_generator_defenses = planetary_defenses["shield_generator_defenses"]
                 turrets_defenses = planetary_defenses["turrets_defenses"]
                 the_rest_buildings_defenses = planetary_defenses["the_rest_buildings_defenses"]
                 shield_level = planetary_defenses["shield_level"]
                 #
-                result_for_shield_generator = self.old_bombardment_calculate_valkiries_for_shield_generator(spaceship_module, planet, valkirie_dead_by_turrets, \
-                        valkirie_dead_by_rockets, shield_level)
-                result_for_turrets = self.old_bombardment_calculate_valkiries_for_turrets(spaceship_module, valkirie_dead_by_turrets, valkirie_dead_by_rockets, \
+                result_for_shield_generator = self.old_bombardment_calculate_valkyries_for_shield_generator(spaceship_module, planet, valkyrie_dead_by_turrets, \
+                        valkyrie_dead_by_rockets, shield_level)
+                result_for_turrets = self.old_bombardment_calculate_valkyries_for_turrets(spaceship_module, valkyrie_dead_by_turrets, valkyrie_dead_by_rockets, \
                         turrets_defenses, shield_level)
-                result_for_buildings = self.old_bombardment_calculate_valkiries_for_the_rest_of_buildings(spaceship_module, the_rest_buildings_defenses)
+                result_for_buildings = self.old_bombardment_calculate_valkyries_for_the_rest_of_buildings(spaceship_module, the_rest_buildings_defenses)
                 result.update({"needed_for_shield": result_for_shield_generator[0]})
                 result.update({"dead_for_shield": result_for_shield_generator[1]})
                 result.update({"needed_for_shield_per_level": result_for_shield_generator[2]})
