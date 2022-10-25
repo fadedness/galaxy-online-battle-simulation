@@ -20,7 +20,7 @@ from battlesimulation.components.damage import Damage, DamageArray
 from battlesimulation.components.rocket import Rocket, RocketArray
 from battlesimulation.components.building import Building, BuildingArray
 from battlesimulation.components.module_and_bonuses import ModuleAndBonuses
-from battlesimulation.components.spaceship import Spaceship, Hercules, Loki, Raptor, Hornet, Javelin, Excalibur, Valkirie, Titan, Abaddon
+from battlesimulation.components.spaceship import Spaceship, Hercules, Loki, Raptor, Hornet, Javelin, Excalibur, Valkyrie, Titan, Abaddon
 from battlesimulation.components.planet import Planet
 from battlesimulation.components.spacefleet import SpaceFleet
 from battlesimulation.context import Context
