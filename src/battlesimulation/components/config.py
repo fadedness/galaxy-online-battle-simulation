@@ -139,7 +139,7 @@ _data = {
         7: {
             "id": 7,
             "name": "Валькирия",
-            "name_en": "Valkirie",
+            "name_en": "Valkyrie",
             "damage_type_id": 4,
             "attack": 50,
             "defense": 100,
