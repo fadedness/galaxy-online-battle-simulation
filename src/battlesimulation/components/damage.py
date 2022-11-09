@@ -86,6 +86,12 @@ class Damage(_BasicGameEntity):
             self._set_value(0.0)
 
     @property
+    def damage_left(self) -> float:
+        """Returns float damage left."""
+
+        return self.damage
+
+    @property
     def filtered_str(self) -> str:
         """Different short string of self attributes."""
 
@@ -129,6 +135,16 @@ class DamageArray(_BasicGameEntityArray):
 
         if isinstance(damage_array, DamageArray):
             self._reset_value(damage_array)
+
+    @property
+    def damage_left(self) -> float:
+        """Returns sum of all damages left regardless of damage type."""
+
+        damage_left = 0
+        for damage in self:
+            if isinstance(damage, Damage):
+                damage_left += damage.damage_left
+        return damage_left
 
     @property
     def is_populated(self) -> bool:

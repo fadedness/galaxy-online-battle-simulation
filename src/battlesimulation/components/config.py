@@ -1,8 +1,5 @@
 from __future__ import annotations
-from genericpath import isfile
-import os
-import json
-from turtle import update
+from copy import deepcopy
 import battlesimulation
 
 # Built-in data of game
@@ -19,8 +16,9 @@ _data = {
         "Attack_type": (1,2,3),                       # for rockets: 1 - blockade, 2 - attack, 3 - both
         "Building": (1,2,3,4,5,6,7,8,9,10),           # ids
         "Module": (1,2,3,4,5,6,7,8,9,10),
-        "Valid_targets" : (1,3,4,5,6,7,8,9)              # default valid targets for rockets, that have no valid targets specified
-    },                                                  # Loki spaceships are not targeted by rockets at all
+        "Valid_targets" : (1,3,4,5,6,7,8,9),              # default valid targets for rockets, that have no valid targets specified
+        "Resource": (1,2,3,4,5,6,7,8,9,10)                                     # Loki spaceships are not targeted by rockets at all
+    },
     "Spaceships": {
         1: {
             "id": 1,
@@ -39,7 +37,9 @@ _data = {
             "build_time": 300,
             "cargohold": 100,
             "radar": 0,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "civil",
+            "spaceship_subtype": "mule"
         },
         2: {
             "id": 2,
@@ -58,7 +58,9 @@ _data = {
             "build_time": 120,
             "cargohold": 0,
             "radar": 25,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "civil",
+            "spaceship_subtype": "scout"
         },
         3: {
             "id": 3,
@@ -77,7 +79,9 @@ _data = {
             "build_time": 720,
             "cargohold": 20,
             "radar": 0,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "battle",
+            "spaceship_subtype": "fighter"
         },
         4: {
             "id": 4,
@@ -96,7 +100,9 @@ _data = {
             "build_time": 528,
             "cargohold": 10,
             "radar": 0,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "battle",
+            "spaceship_subtype": "fighter"
         },
         5: {
             "id": 5,
@@ -115,7 +121,9 @@ _data = {
             "build_time": 264,
             "cargohold": 20,
             "radar": 0,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "battle",
+            "spaceship_subtype": "fighter"
         },
         6: {
             "id": 6,
@@ -134,7 +142,9 @@ _data = {
             "build_time": 1200,
             "cargohold": 10,
             "radar": 0,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "battle",
+            "spaceship_subtype": "fighter"
         },
         7: {
             "id": 7,
@@ -153,7 +163,9 @@ _data = {
             "build_time": 2400,
             "cargohold": 10,
             "radar": 0,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "battle",
+            "spaceship_subtype": "bomber"
         },
         8: {
             "id": 8,
@@ -170,9 +182,11 @@ _data = {
             "calc_speed": 1.536,
             "price": 32000,
             "build_time": 5400,
-            "cargohold": 10,
+            "cargohold": 0,
             "radar": 0,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "battle",
+            "spaceship_subtype": "occupier"
         },
         9: {
             "id": 9,
@@ -189,9 +203,11 @@ _data = {
             "calc_speed": 2.048,
             "price": 4400,
             "build_time": 1800,
-            "cargohold": 0,
+            "cargohold": 10,
             "radar": 0,
-            "accuracy": 80
+            "accuracy": 80,
+            "spaceship_type": "battle",
+            "spaceship_subtype": "fighter"
         }
     },
     "Damages": {
@@ -243,6 +259,18 @@ _data = {
         9: {"id":9,"name":"Спутник Энергия","name_en":"Satellite Energy","attack":0,"defense":0,"speed":0,"price":10000,"solarium":0,"build_time":129},
         10: {"id":10,"name":"Комплекс Абордаж","name_en":"Complex Boarding","attack":0,"defense":0,"speed":0,"price":5000,"solarium":1,"build_time":64}
     },
+    "Resources": {
+            1: {"id": 1, "name": "Ториум", "name_en": "Torium", "cargo_space": 100},
+            2: {"id": 2, "name": "Ванадиум", "name_en": "Wanadium", "cargo_space": 100},
+            3: {"id": 3, "name": "Оттариум", "name_en": "Ottarium", "cargo_space": 100},
+            4: {"id": 4, "name": "Хромиум", "name_en": "Chromium", "cargo_space": 100},
+            5: {"id": 5, "name": "Кладиум", "name_en": "Kladium", "cargo_space": 100},
+            6: {"id": 6, "name": "Неодиум", "name_en": "Neodium", "cargo_space": 100},
+            7: {"id": 7, "name": "Минтериум", "name_en": "Minterium", "cargo_space": 100},
+            8: {"id": 8, "name": "Соляриум", "name_en": "Solarium", "cargo_space": 10000},
+            9: {"id": 9, "name": "Ресурс расы", "name_en": "Race resource", "cargo_space": 100},
+            10: {"id": 10, "name": "Энергия", "name_en": "Energy", "cargo_space": 1}
+        },
     "Globals": {
         "turret_damage": 100,
         "turret_damage_type_id": 5,
@@ -254,7 +282,10 @@ _data = {
         "threshold": 0.5,
         "accuracy": 80,
         "max_speed_bonus": 2.0,
-        "max_building_level": 30
+        "max_building_level": 30,
+        "fuel_percent": 2,
+        "coef_for_cost": 1.0,
+        "coef_for_time": 1.0
     }
 }
 
@@ -271,6 +302,7 @@ class _GlobalGameParameters():
         self.types_building = tuple(data["Types"]["Building"])
         self.types_module = tuple(data["Types"]["Module"])
         self.types_valid_targets = tuple(data["Types"]["Valid_targets"])
+        self.types_resource = tuple(data["Types"]["Resource"])
         spaceships = {}
         for key in data["Spaceships"]:
             spaceships.update({int(key): data["Spaceships"][key]})
@@ -299,11 +331,16 @@ class _GlobalGameParameters():
         for key in data["Modules"]:
             modules.update({int(key): data["Modules"][key]})
         self.modules = modules
+        resources = {}
+        for key in data["Resources"]:
+            resources.update({int(key): data["Resources"][key]})
+        self.resources = resources
         #self.spaceships = data["Spaceships"]
         #self.damages = data["Damages"]
         #self.rockets = data["Rockets"]
         #self.buildings = data["Buildings"]
         #self.modules = data["Modules"]
+        #self.resources = data["Resources"]
         self.globals = data["Globals"]
         self.thold_per = data["Globals"]["thold_per"]
         self.thold_max = data["Globals"]["thold_max"]
@@ -335,12 +372,14 @@ class _GlobalGameParameters():
         assert type(self.types_building) == tuple
         assert type(self.types_module) == tuple
         assert type(self.types_valid_targets) == tuple
+        assert type(self.types_resource) == tuple
         assert type(self.spaceships) == dict
         assert type(self.damages) == dict
         assert type(self.planetary_coefs) == dict
         assert type(self.rockets) == dict
         assert type(self.buildings) == dict
         assert type(self.modules) == dict
+        assert type(self.resources) == dict
         assert type(self.globals) == dict
         assert len(self.types_damage) > 0
         assert len(self.types_spaceship) > 0
@@ -356,12 +395,14 @@ class _GlobalGameParameters():
         assert len(self.rockets) > 0
         assert len(self.buildings) > 0
         assert len(self.modules) > 0
+        assert len(self.resources) > 0
         assert len(self.globals) > 0
         assert self.types_damage == tuple(self.damages.keys())
         assert self.types_spaceship == tuple(self.spaceships.keys())
         assert self.types_rocket == tuple(self.rockets.keys())
         assert self.types_building == tuple(self.buildings.keys())
         assert self.types_module == tuple(self.modules.keys())
+        assert self.types_resource == tuple(self.resources.keys())
         assert type(self.thold_per) == float
         assert type(self.thold_max) == float
         assert type(self.thold_max_bonus) == int
@@ -387,7 +428,8 @@ class _SpaceshipAssert():
     def __init__(self, id: int, name: str, name_en: str, damage_type_id: int, attack: int,\
                 defense: int, defenses: dict, weight: int, attack_priority: int, \
                 defense_priority: int, speed: int, calc_speed: float, price: int, \
-                build_time: int, cargohold: int, radar: int, accuracy: float, ggp: _GlobalGameParameters) -> None:
+                build_time: int, cargohold: int, radar: int, accuracy: float, \
+                spaceship_type: str, spaceship_subtype: str, ggp: _GlobalGameParameters) -> None:
         assert id in ggp.types_spaceship
         assert type(name) == str
         assert type(name_en) == str
@@ -409,6 +451,8 @@ class _SpaceshipAssert():
         assert type(cargohold) == int
         assert type(radar) == int
         assert type(accuracy) == int
+        assert type(spaceship_type) == str
+        assert type(spaceship_subtype) == str
         assert attack > 0
         assert defense > 0
         assert weight > 0
@@ -422,6 +466,8 @@ class _SpaceshipAssert():
         assert radar >= 0
         assert accuracy > 0
         assert accuracy <= 100
+        assert len(spaceship_type) > 0
+        assert len(spaceship_subtype) > 0
 
 ##############################################
 
@@ -447,8 +493,12 @@ class _RocketAssert():
 
 def load_global_game_parameters(data: dict = _data) -> bool:
     """When you import this module (battlesimulation) all data is loaded, no need to call this func.
+
         But if you need to use custom data, you can call this and pass your data.
+        If you loaded it via json, you should first convert it via
+        convert_json_data_to_int_keys()
         If your data is invalid an Exception will be raised."""
+
     _ggp = _GlobalGameParameters(data)
     for i in _ggp.types_spaceship:
         spaceships = _SpaceshipAssert(**_ggp.spaceships.get(i), ggp=_ggp)
@@ -466,3 +516,46 @@ def load_global_game_parameters(data: dict = _data) -> bool:
     #    result = False
     #else:
     #    raise Exception("data passed is not fully valid.")
+
+def convert_json_data_to_int_keys(data: dict) -> dict:
+    """Converts data from json.load to dict with int keys, lists to tuples."""
+
+    new_data = {}
+    new_data.update({"Types": deepcopy(data["Types"])})
+    for game_types in new_data["Types"]:
+        new_data["Types"][game_types] = tuple(new_data["Types"][game_types])
+    new_spaceships = {}
+    for ss_id in data["Spaceships"]:
+        spaceship = data["Spaceships"][ss_id].copy()
+        new_defenses = {}
+        for def_id in spaceship["defenses"]:
+            new_defenses.update({int(def_id): spaceship["defenses"][def_id]})
+        spaceship.update({"defenses": new_defenses})
+        new_spaceships.update({int(ss_id): deepcopy(spaceship)})
+    new_data.update({"Spaceships": deepcopy(new_spaceships)})
+    new_damages = {}
+    for dam_id in data["Damages"]:
+        new_damages.update({int(dam_id): data["Damages"][dam_id].copy()})
+    new_data.update({"Damages": deepcopy(new_damages)})
+    new_data.update({"Planetary_coefs": deepcopy(data["Planetary_coefs"])})
+    new_rockets = {}
+    for rocket_id in data["Rockets"]:
+        rocket = data["Rockets"][rocket_id].copy()
+        if "valid_targets" in rocket:
+            rocket["valid_targets"] = tuple(rocket["valid_targets"])
+        new_rockets.update({int(rocket_id): deepcopy(rocket)})
+    new_data.update({"Rockets": deepcopy(new_rockets)})
+    new_buildings = {}
+    for build_id in data["Buildings"]:
+        new_buildings.update({int(build_id): data["Buildings"][build_id].copy()})
+    new_data.update({"Buildings": deepcopy(new_buildings)})
+    new_modules = {}
+    for mod_id in data["Modules"]:
+        new_modules.update({int(mod_id): data["Modules"][mod_id].copy()})
+    new_data.update({"Modules": deepcopy(new_modules)})
+    new_resources = {}
+    for res_id in data["Resources"]:
+        new_resources.update({int(res_id): data["Resources"][res_id].copy()})
+    new_data.update({"Resources": deepcopy(new_resources)})
+    new_data.update({"Globals": deepcopy(data["Globals"])})
+    return new_data

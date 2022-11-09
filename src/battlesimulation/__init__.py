@@ -1,4 +1,4 @@
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 from battlesimulation.components.config import _GlobalGameParameters
 
@@ -6,7 +6,7 @@ _GGP: _GlobalGameParameters = None
 _debug_printing = False
 _debug_limit_variables = True
 
-from battlesimulation.components.config import load_global_game_parameters
+from battlesimulation.components.config import load_global_game_parameters, convert_json_data_to_int_keys
 
 load_global_game_parameters()
 

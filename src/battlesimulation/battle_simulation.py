@@ -808,6 +808,7 @@ class BattleSimulation():
                     if isinstance(var_to_save_spacefleet_1, dict):
                         self._recursive_deal_damage_simple_fleet_vs_damage_array(fleet1)
                         fleet1.finalize_battle_results()
+                        fleet1._leftover_damage = fleet2_copy._temp_incoming_damage_array
                         var_to_save_spacefleet_1[spaceship_id].append(fleet1)
                     break
 
@@ -876,8 +877,12 @@ class BattleSimulation():
                 self._recursive_rockets_damage_dealer(fleet1, planet.rockets.make_a_copy_of_self(), target_blockade, 1)
                 self._finalize_bonuses_mods(fleet1, fleet2_copy)
                 fleet1._temp_incoming_damage_array = fleet2_copy.total_damage
+                fleet2_copy._temp_incoming_damage_array = fleet1.total_damage
                 self._recursive_deal_damage_simple_fleet_vs_damage_array(fleet1)
+                self._recursive_deal_damage_simple_fleet_vs_damage_array(fleet2_copy)
                 fleet1.finalize_battle_results()
+                fleet2_copy.finalize_battle_results()
+                fleet1._leftover_damage = fleet2_copy._temp_incoming_damage_array
                 var_to_save_spacefleet_1[spaceship_id].append(fleet1)
                 battlesimulation._debug_printing = debug_print_flag
 

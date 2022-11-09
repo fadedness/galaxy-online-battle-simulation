@@ -100,11 +100,13 @@ class Context():
     fleet_1_acc_type = property(get_fleet_1_acc_type, set_fleet_1_acc_type)
     fleet_2_acc_type = property(get_fleet_2_acc_type, set_fleet_2_acc_type)
     fleet_3_acc_type = property(get_fleet_3_acc_type, set_fleet_3_acc_type)
-    
+
     def __init__(self) -> None:
         """New instance of Context class."""
 
         self.context_branch = None
+        self.antirocket = {}
+        self.antirocket_blockade = {}
         self._flag_to_make_context_branch = False
         self._text_for_finding_suitable_fleets = ""
         self._battle_simulation = battlesimulation._root_battle_simulation
@@ -125,8 +127,15 @@ class Context():
         self._results_for_old_bombardment = {}
         self._top_sorted_length = 5
         self._add_energy_cost_to_departure = 2
-        self._coef_for_cost = 1.0
-        self._coef_for_time = 1.0
+        self._coef_for_cost = battlesimulation._GGP.globals["coef_for_cost"]
+        self._coef_for_time = battlesimulation._GGP.globals["coef_for_time"]
+        self._default_spaceships_for_finder = []
+        for ss_id, ss in battlesimulation._GGP.spaceships.items():
+            ss_type = ss["spaceship_type"]
+            ss_subtype = ss["spaceship_subtype"]
+            if ss_type == "battle" and ss_subtype == "fighter":
+                self._default_spaceships_for_finder.append(ss_id)
+        self._default_spaceships_for_finder = tuple(self._default_spaceships_for_finder)
 
     def help(self) -> str:
         """prints and returns string: short list of to do things to Simulate Battle."""
@@ -629,7 +638,7 @@ class Context():
 
         if isinstance(self._fleet_1, SpaceFleet) and isinstance(self._fleet_1.modules, ModuleAndBonuses):
             if (isinstance(data, list) or isinstance(data, tuple)):
-                self._fleet_1.set_module_attack_damage_mods(*data)
+                self._fleet_1.set_module_attack_damage_mods(data)
             elif isinstance(data, dict):
                 self._fleet_1.set_module_attack_damage_mods(data)
 
@@ -644,7 +653,7 @@ class Context():
 
         if isinstance(self._fleet_1, SpaceFleet) and isinstance(self._fleet_1.modules, ModuleAndBonuses):
             if (isinstance(data, list) or isinstance(data, tuple)):
-                self._fleet_1.set_module_defense_damage_mods(*data)
+                self._fleet_1.set_module_defense_damage_mods(data)
             elif isinstance(data, dict):
                 self._fleet_1.set_module_defense_damage_mods(data)
 
@@ -659,7 +668,7 @@ class Context():
 
         if isinstance(self._fleet_2, SpaceFleet) and isinstance(self._fleet_2.modules, ModuleAndBonuses):
             if (isinstance(data, list) or isinstance(data, tuple)):
-                self._fleet_2.set_module_attack_damage_mods(*data)
+                self._fleet_2.set_module_attack_damage_mods(data)
             elif isinstance(data, dict):
                 self._fleet_2.set_module_attack_damage_mods(data)
 
@@ -674,7 +683,7 @@ class Context():
 
         if isinstance(self._fleet_2, SpaceFleet) and isinstance(self._fleet_2.modules, ModuleAndBonuses):
             if (isinstance(data, list) or isinstance(data, tuple)):
-                self._fleet_2.set_module_defense_damage_mods(*data)
+                self._fleet_2.set_module_defense_damage_mods(data)
             elif isinstance(data, dict):
                 self._fleet_2.set_module_defense_damage_mods(data)
 
@@ -689,7 +698,7 @@ class Context():
 
         if isinstance(self._fleet_3, SpaceFleet) and isinstance(self._fleet_3.modules, ModuleAndBonuses):
             if (isinstance(data, list) or isinstance(data, tuple)):
-                self._fleet_3.set_module_attack_damage_mods(*data)
+                self._fleet_3.set_module_attack_damage_mods(data)
             elif isinstance(data, dict):
                 self._fleet_3.set_module_attack_damage_mods(data)
 
@@ -704,7 +713,7 @@ class Context():
 
         if isinstance(self._fleet_3, SpaceFleet) and isinstance(self._fleet_3.modules, ModuleAndBonuses):
             if (isinstance(data, list) or isinstance(data, tuple)):
-                self._fleet_3.set_module_defense_damage_mods(*data)
+                self._fleet_3.set_module_defense_damage_mods(data)
             elif isinstance(data, dict):
                 self._fleet_3.set_module_defense_damage_mods(data)
 
@@ -1107,7 +1116,7 @@ class Context():
     def _simulate_fleet_1_vs_rockets(self) -> None:
         """Fleet 1 vs Rockets simulation part."""
 
-        if self._fleet_1.is_populated and self._planet.rockets.is_populated(self._fleet_1, self._attack_target):
+        if self._fleet_1.is_populated and self._planet.rockets.is_populated(self._fleet_1, not self._attack_target):
             self._battle_simulation._wrapper_rockets_damage_dealer(self._fleet_1, \
                     self._planet, target_blockade=not self._attack_target)
         else:
@@ -1178,14 +1187,17 @@ class Context():
         fleet_1_acc_type = self._check_single_fleet_acc_type_and_return_opposite_range_value(self._fleet_1)
         if fleet_1_acc_type in ("min","max"):
             self.context_branch._fleet_1.set_acc_type(fleet_1_acc_type)
+            self.context_branch._fleet_1_acc_type = fleet_1_acc_type
 
         fleet_2_acc_type = self._check_single_fleet_acc_type_and_return_opposite_range_value(self._fleet_2)
         if fleet_2_acc_type in ("min","max"):
             self.context_branch._fleet_2.set_acc_type(fleet_2_acc_type)
+            self.context_branch._fleet_2_acc_type = fleet_2_acc_type
 
         fleet_3_acc_type = self._check_single_fleet_acc_type_and_return_opposite_range_value(self._fleet_3)
         if fleet_3_acc_type in ("min","max"):
             self.context_branch._fleet_3.set_acc_type(fleet_3_acc_type)
+            self.context_branch._fleet_3_acc_type = fleet_3_acc_type
         
         self.context_branch._planet = self._planet.make_a_copy_of_self()
         self.context_branch._attack_target = self._attack_target
@@ -1332,7 +1344,7 @@ class Context():
                         text += self._make_text_for_costs_and_build_times_single_fleet(fleet_finder_dict[ss_id][1])
         return text
 
-    def find_suitable_fleet_branch(self) ->  None:
+    def find_suitable_fleet_branch(self) ->  dict:
         """Finds suitable Fleet 1 to defeat the rest set Game objects.
 
             If Context._attack_target is False (Fleet 1 is going to make a blockade) then Fleet 2 is not going to take part in simulation.
@@ -1347,8 +1359,8 @@ class Context():
         fleet_to_pass = None
         if self._attack_target and self._fleet_3.is_populated and self._fleet_2.is_populated:
             raw_result_complicated = self._battle_simulation.find_suitable_fleets_to_beat_two_subsequent_enemies(self._fleet_1.modules, \
-                    self._fleet_2, self._fleet_3, self._planet, not self._attack_target, fleet1_acc_type=self._fleet_1.acc_type, \
-                    var_to_save_spacefleet_1=self._fleet_finder_dict)
+                    self._fleet_2, self._fleet_3, self._planet, not self._attack_target, self._fleet_1.acc_type, \
+                    self._default_spaceships_for_finder, self._fleet_finder_dict)
         else:
             if self._attack_target and self._fleet_3.is_populated:
                 fleet_to_pass = self._fleet_3
@@ -1357,7 +1369,7 @@ class Context():
             elif not self._attack_target and self._fleet_3.is_populated:
                 fleet_to_pass = self._fleet_3
             raw_result_simple = self._battle_simulation.find_suitable_fleets_to_beat_enemy(self._fleet_1.modules, fleet_to_pass, self._planet, \
-                    not self._attack_target, self._fleet_1.acc_type, var_to_save_spacefleet_1=self._fleet_finder_dict)
+                    not self._attack_target, self._fleet_1.acc_type, self._default_spaceships_for_finder, self._fleet_finder_dict)
 
         raw_result = raw_result_complicated if raw_result_complicated is not None else raw_result_simple
         self._fleet_finder_raw_results_dict = raw_result
@@ -1435,6 +1447,9 @@ class Context():
                 self._fleet_1.finalize_battle_results()
                 self._fleet_3.finalize_battle_results()
                 print(self._print_simulate_end())
+                if self._flag_to_make_context_branch:
+                    print(self._print_combined_results())
+                    print(self._print_pretty_ranges_text())
                 return
 
             # Fleet 1 is attacking the Planet
@@ -1451,6 +1466,29 @@ class Context():
             if self._flag_to_make_context_branch:
                 print(self._print_combined_results())
                 print(self._print_pretty_ranges_text())
+
+        return
+
+    def simulate_antirocket(self, spaceship_ids_list: list) -> None:
+        """Calculates Spaceships needed to destroy Rockets on the Planet.
+
+            Stores results in antirocket and antirocket_blockade dicts {ss_id: quantity}.
+        """
+
+        self.antirocket.clear()
+        self.antirocket_blockade.clear()
+
+        for ss_id in spaceship_ids_list:
+            if ss_id in battlesimulation._GGP.types_spaceship:
+                value = self._battle_simulation._find_number_of_spaceships_to_neutralize_planet_rockets_and_turrets_damage(ss_id, \
+                    self._fleet_1.modules, self._planet, False, False)
+                self.antirocket.update({ss_id: value})
+
+        for ss_id in spaceship_ids_list:
+            if ss_id in battlesimulation._GGP.types_spaceship:
+                value = self._battle_simulation._find_number_of_spaceships_to_neutralize_planet_rockets_and_turrets_damage(ss_id, \
+                    self._fleet_1.modules, self._planet, True, False)
+                self.antirocket_blockade.update({ss_id: value})
 
         return
 

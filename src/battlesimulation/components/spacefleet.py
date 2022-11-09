@@ -36,6 +36,8 @@ class SpaceFleet(_BasicGameEntityArray):
         self.incoming_turrets_damage: DamageArray = None
         # this is for storing shield generator EMP burst damage     DamageArray()
         self.incoming_emp_shield_damage: DamageArray = None
+        # this is for my gui module to store this Fleet's leftover damage, dealt to opposite Fleet 2
+        self._leftover_damage: DamageArray = None
         self._reinit()
 
     def _reinit(self) -> None:
@@ -60,6 +62,7 @@ class SpaceFleet(_BasicGameEntityArray):
         self.incoming_damage_array = DamageArray()
         self.incoming_turrets_damage = DamageArray()
         self.incoming_emp_shield_damage = DamageArray()
+        self._leftover_damage = DamageArray()
 
     def _reinit_modules(self) -> None:
         """Resets self.modules to new default Modules."""

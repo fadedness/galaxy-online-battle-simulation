@@ -79,7 +79,7 @@ def main_menu_string() -> str:
     text += " 5. Simulate Battle in set conditions.\n"
     text += " 6. Find Fleet 1 that will defeat set conditions (If you have set Fleet 1 up - it will be cleared).\n"
     text += " 7. Find amount of Valkyries needed to destroy Planetary defenses (Bombardment).\n\n"
-    text += "10. Set Fleet's accuracy to \"range\" -> two Simulations will be made: one with minimum and one with maximum accuracy."
+    text += "10. Set Fleet's accuracy to \"range\" -> two Simulations will be made: one with minimum and one with maximum accuracy.\n"
     text += "20. Print short description of each Fleet's role in Simulation.\n"
     text += "21. Print Game Objects.\n"
     text += "22. About.\n"
@@ -206,13 +206,24 @@ def clear_fleet(fleet_number: int) -> None:
 
     fleet = get_fleet_reference_from_number(fleet_number)
     fleet.set_fleet([])
+    fleet.set_acc_type("min")
+    if "1" in fleet.custom_name:
+        fleet.attacking = True
+    else:
+        fleet.attacking = False
 
 def clear_all() -> None:
     """Clear all Game Objects."""
 
     c.clear_fleet_1()
+    c.set_fleet_1_acc_type("min")
+    c.set_fleet_1_attacking()
     c.clear_fleet_2()
+    c.set_fleet_2_acc_type("min")
+    c.set_fleet_2_attacking()
     c.clear_fleet_3()
+    c.set_fleet_3_acc_type("min")
+    c.set_fleet_3_attacking()
     c.reset_all_buildings()
     c.reset_rockets_to_zero()
     c.set_planet(1,0)

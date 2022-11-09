@@ -55,6 +55,8 @@ class Spaceship(_BasicGameEntity):
         self.cargohold = battlesimulation._GGP.spaceships[id]["cargohold"]
         self.radar = battlesimulation._GGP.spaceships[id]["radar"]
         self.accuracy = battlesimulation._GGP.spaceships[id]["accuracy"]
+        self.spaceship_type = battlesimulation._GGP.spaceships[id]["spaceship_type"]
+        self.spaceship_subtype = battlesimulation._GGP.spaceships[id]["spaceship_subtype"]
 
     def single_hp(self, defense_type: int, final_defense_mod: float) -> float:
         """Calculates single spaceship's HP with the defense mods for the specified defense type."""
@@ -128,6 +130,12 @@ class Spaceship(_BasicGameEntity):
         return int(_my_round_threshold_up(self.quantity, 0, battlesimulation._GGP.threshold))
 
     @property
+    def dead(self) -> int:
+        """How many spaceships are dead."""
+
+        return int(self.original_quantity - self.alive)
+
+    @property
     def cost_of_original(self) -> int:
         """Cost in energy of Spaceships quantity before any Battles."""
 
@@ -137,7 +145,7 @@ class Spaceship(_BasicGameEntity):
     def cost_of_dead(self) -> int:
         """Cost in energy of destroyed Spaceships."""
 
-        return (self._original_value - self.alive) * self.price
+        return self.dead * self.price
 
     @property
     def build_time_of_original(self) -> int:
@@ -149,7 +157,7 @@ class Spaceship(_BasicGameEntity):
     def build_time_of_dead(self) -> int:
         """Time in seconds to build (at Spacecraft Plant level 1) destroyed Spaceships."""
 
-        return (self._original_value - self.alive) * self.build_time
+        return self.dead * self.build_time
 
     @property
     def detailed_str(self) -> str:
