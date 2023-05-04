@@ -109,8 +109,8 @@ class BattleSimulation():
         return (overbonus1, overbonus2)
 
     def _finalize_bonuses_mods(self, fleet1: SpaceFleet, fleet2: SpaceFleet = None, \
-            sequence: tuple = ("module","superiority","damage"), \
-            combination_method_for_mods: tuple = ("add", "add", "multiply"), \
+            sequence: tuple = ("module","superiority","damage","elder"), \
+            combination_method_for_mods: tuple = ("add", "add", "add", "add"), \
             truncate_to: int = 6) -> None:
         """Combines bonuses from Modules with from Modules attack/defense damage specific and with superiority bonus.
 
@@ -118,25 +118,25 @@ class BattleSimulation():
             Also if you omit Fleet 2, bonuses for Fleet 1 will be combined without superiority.
         """
 
-        if isinstance(sequence, tuple) and len(sequence) == 3 and "module" in sequence \
-                and "superiority" in sequence and "damage" in sequence:
+        if isinstance(sequence, tuple) and len(sequence) == 4 and "module" in sequence \
+                and "superiority" in sequence and "damage" in sequence and "elder" in sequence:
             # ok
             pass
         else:
             # set the defaults
             debug_print("Invalid input for sequence. Using defaults.")
-            sequence = ("module","superiority","damage")
-        if isinstance(combination_method_for_mods, tuple) and len(combination_method_for_mods) == 3:
+            sequence = ("module","superiority","damage","elder")
+        if isinstance(combination_method_for_mods, tuple) and len(combination_method_for_mods) == 4:
             for item in combination_method_for_mods:
                 if item not in ("add","multiply"):
                     # set the defaults
                     debug_print("Invalid input for combination_method_for_mods. Using defaults.")
-                    combination_method_for_mods = ("add", "add", "multiply")
+                    combination_method_for_mods = ("add", "add", "add")
                     break
         else:
             # set the defaults
             debug_print("Invalid input for combination_method_for_mods. Using defaults.")
-            combination_method_for_mods = ("add", "add", "multiply")
+            combination_method_for_mods = ("add", "add", "add", "add")
         if isinstance(fleet1, SpaceFleet) and isinstance(fleet2, SpaceFleet):
             superiority = self._calc_superiority(fleet1, fleet2)
             fleet1.modules.calc_final_damage_mods(superiority[0], *combination_method_for_mods, sequence, truncate_to)
@@ -995,6 +995,74 @@ class BattleSimulation():
             else:
                 result = _my_round_up(against_turrets + against_rockets)
             return result
+
+    def __test_spaceship_double_combinations_to_beat_enemy_minimum(self, ss_id_1: int, ss_id_2: int, fleet1: SpaceFleet, fleet2: SpaceFleet):
+        """"""
+
+        ss_id_step_rate = 0.01
+
+        fleet1_copy = fleet1.make_a_copy_of_self()
+        fleet1_copy.coef_cost_of_dead = fleet1.coef_cost_of_dead
+        fleet1_copy.coef_build_time_of_dead = fleet1.coef_build_time_of_dead
+        fleet1_copy.modules.calc_final_damage_mods(1.0)
+
+        fleet2_copy = fleet2.make_a_copy_of_self()
+
+        ss_id_1_minimum = self._find_suitable_spaceship_to_beat_enemy_minimum(ss_id_1, fleet1_copy.modules, fleet2_copy)
+        fleet1_copy.set_fleet(((ss_id_1, ss_id_1_minimum)))
+        superiority = self._calc_superiority(fleet1_copy, fleet2_copy)
+        approximate_fleet1_superiority = superiority[0]
+        #ss_id_2_minimum = self._find_suitable_spaceship_to_beat_enemy_minimum(ss_id_2, fleet1_copy.modules, fleet2)
+
+        ss_id_1_step = int(ss_id_1_minimum * ss_id_step_rate)
+        ss_id_cap_stop = ss_id_1_minimum // 2
+        ss_id_cap = 0
+        ss_id_1_total = ss_id_1_minimum + ss_id_1_step
+        ss_id_2_total = 0
+        ss_quantities_to_test = []
+        ss_1 = Spaceship(ss_id_1, ss_id_1_minimum)
+        ss_1_damage_one_spaceship = ss_1.attack * (ss_1.accuracy / 100) * fleet1_copy.modules.final_attack_damage_mods[ss_1.damage_type_id]
+        ss_1_damage = ss_1_damage_one_spaceship * ss_1.quantity
+        ss_1_damage_step = ss_1_damage_one_spaceship * ss_id_1_step
+        ss_2 = Spaceship(ss_id_2)
+        final_results = []
+        while 1:
+            if ss_id_cap + ss_id_1_step > ss_id_cap_stop:
+                break
+            ss_id_cap += ss_id_1_step
+            ss_id_1_total -= ss_id_1_step
+            ss_1_damage -= ss_1_damage_step
+            ss_1_damage_array = DamageArray()
+            ss_1_damage_array.add_damage(Damage(ss_1.damage_type_id, ss_1_damage))
+            fleet2_copy_temp = fleet2.make_a_copy_of_self()
+            fleet2_copy_temp.modules.calc_final_damage_mods(superiority[1])
+            fleet2_copy_temp._temp_incoming_damage_array = ss_1_damage_array
+            self._recursive_deal_damage_simple_fleet_vs_damage_array(fleet2_copy_temp)
+            damage_needed = 0
+            for ss in fleet2_copy_temp:
+                ss: Spaceship
+                damage_needed += ss.quantity * ss.defenses[ss_1.damage_type_id]
+            ss_id_2_step = _my_round_up(damage_needed / (ss_2.attack * (ss.accuracy / 100) * fleet1_copy.modules.final_attack_damage_mods[ss_2.damage_type_id]))
+            ss_id_2_total += ss_id_2_step
+            fleet1_copy_temp = fleet1_copy.make_a_copy_of_self()
+            fleet1_copy_temp.set_fleet([(ss_id_1, ss_id_1_total), (ss_id_2, ss_id_2_total)])
+            fleet2_copy_temp = fleet2_copy.make_a_copy_of_self()
+            self.simulate(fleet1_copy_temp, fleet2_copy_temp, Planet())
+            print(f"\n\nFleet 1:\n{fleet1_copy_temp.filtered_alive_str}\n\nFleet 2:\n{fleet2_copy_temp.filtered_alive_str}\n\n")
+            #battlesimulation._debug_printing = False
+            while 1:
+                ss_id_2_total += 1
+                fleet1_copy_temp = fleet1_copy.make_a_copy_of_self()
+                fleet1_copy_temp.set_fleet([(ss_id_1, ss_id_1_total), (ss_id_2, ss_id_2_total)])
+                fleet2_copy_temp = fleet2.make_a_copy_of_self()
+                self.simulate(fleet1_copy_temp, fleet2_copy_temp, Planet())
+                print(f"\n\nFleet 1:\n{fleet1_copy_temp.filtered_alive_str}\n\nFleet 2:\n{fleet2_copy_temp.filtered_alive_str}\n\n")
+                if not fleet2_copy_temp.is_populated:
+                    break
+            #battlesimulation._debug_printing = True
+            final_results.append((ss_id_1_total, ss_id_2_total, fleet1_copy_temp.antirating))
+
+        return final_results
 
     def _get_basic_vars_for_old_bombardment(self, spaceship_module: ModuleAndBonuses, planet: Planet) -> dict:
         """Old Bombardment Mechanic, returns a dict with values of Planetary Defenses."""

@@ -14,6 +14,9 @@ class ModuleAndBonuses():
         self.final_attack_damage_mods = {}
         self.final_defense_damage_mods = {}
         self.final_no_superiority_defense_damage_mods = {}
+        self.elder_bonus_attack = 1.0
+        self.elder_bonus_defense = 1.0
+        self.elder_bonus_speed = 1.0
         self._reinit()
 
     def _reinit(self):
@@ -146,9 +149,55 @@ class ModuleAndBonuses():
         else:
             pass
 
+    def elder_buff_attack(self):
+        """Sets elder attack bonus to 1.5 (+50%)"""
+
+        self.elder_bonus_attack = 1.5
+
+    def elder_debuff_attack(self):
+        """Sets elder attack bonus to 0.5 (-50%)"""
+
+        self.elder_bonus_attack = 0.5
+
+    def reset_elder_attack(self):
+        """Sets elder attack bonus to 1.0 (+0%)"""
+
+        self.elder_bonus_attack = 1.0
+
+    def elder_buff_defense(self):
+        """Sets elder defense bonus to 1.5 (+50%)"""
+
+        self.elder_bonus_defense = 1.5
+
+    def elder_debuff_defense(self):
+        """Sets elder defense bonus to 0.5 (-50%)"""
+
+        self.elder_bonus_defense = 0.5
+
+    def reset_elder_defense(self):
+        """Sets elder defense bonus to 1.0 (+0%)"""
+
+        self.elder_bonus_defense = 1.0
+
+    def elder_buff_speed(self):
+        """Sets elder speed bonus to 1.5 (+50%)"""
+
+        self.elder_bonus_speed = 1.5
+
+    def elder_debuff_speed(self):
+        """Sets elder speed bonus to 0.5 (-50%)"""
+
+        self.elder_bonus_speed = 0.5
+
+    def reset_elder_speed(self):
+        """Sets elder speed bonus to 1.0 (+0%)"""
+
+        self.elder_bonus_speed = 1.0
+
     def calc_final_damage_mods(self, superiority: float, combination_module: str = "add", \
             combination_superiority: str = "add", combination_damage: str = "add", \
-            sequence: Union[list,tuple] = ("module","superiority","damage"), \
+            combination_elder: str = "add", \
+            sequence: Union[list,tuple] = ("module","superiority","damage","elder"), \
             truncate_to: int = 6) -> None:
         """Combines bonuses from Modules with from Modules attack/defense damage specific and with superiority bonus.
 
@@ -157,7 +206,7 @@ class ModuleAndBonuses():
         """
 
         if isinstance(superiority, float) and superiority >= 1.0 and \
-                (isinstance(sequence, list) or isinstance(sequence, tuple)) and len(sequence) == 3:
+                (isinstance(sequence, list) or isinstance(sequence, tuple)) and len(sequence) == 4:
             result_attack = {}
             result_defense = {}
             result_no_superiority_defense = {}
@@ -203,6 +252,20 @@ class ModuleAndBonuses():
                             result_no_superiority_defense[id] *= self.defense_damage_mods[id]
                     else:
                         # don't combine damage mods
+                        pass
+                elif operation == "elder":
+                    if combination_elder == "add":
+                        for id in result_attack:
+                            result_attack[id] += self.elder_bonus_attack - 1
+                            result_defense[id] += self.elder_bonus_defense - 1
+                            result_no_superiority_defense[id] += self.elder_bonus_defense - 1
+                    elif combination_elder == "multiply":
+                        for id in result_attack:
+                            result_attack[id] *= self.elder_bonus_attack
+                            result_defense[id] *= self.elder_bonus_defense
+                            result_no_superiority_defense[id] *= self.elder_bonus_defense
+                    else:
+                        # don't combine elder bonuses
                         pass
             for id in result_attack:
                 result_attack[id] = _my_truncate(result_attack[id], truncate_to)

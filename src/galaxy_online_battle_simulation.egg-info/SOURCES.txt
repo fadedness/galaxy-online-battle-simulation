@@ -23,3 +23,12 @@ src/galaxy_online_battle_simulation.egg-info/SOURCES.txt
 src/galaxy_online_battle_simulation.egg-info/dependency_links.txt
 src/galaxy_online_battle_simulation.egg-info/entry_points.txt
 src/galaxy_online_battle_simulation.egg-info/top_level.txt
+tests/test_anti_enemy_finder.py
+tests/test_buildings_planet.py
+tests/test_combinations.py
+tests/test_context.py
+tests/test_context_helper.py
+tests/test_custom_data.py
+tests/test_fleet_copy.py
+tests/test_fleet_vs_fleet.py
+tests/test_fleet_vs_rockets.py

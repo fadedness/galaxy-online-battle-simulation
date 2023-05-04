@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "galaxy-online-battle-simulation"
-version = "1.1.0"
+version = "1.2.0"
 description = "Module for simulation of different battles in the online space strategy game Galaxy Online."
 readme = "README.md"
 authors = [{ name = "fadedness" }]

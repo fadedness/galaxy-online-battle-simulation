@@ -38,6 +38,8 @@ class SpaceFleet(_BasicGameEntityArray):
         self.incoming_emp_shield_damage: DamageArray = None
         # this is for my gui module to store this Fleet's leftover damage, dealt to opposite Fleet 2
         self._leftover_damage: DamageArray = None
+        self.coef_cost_of_dead = 1.0
+        self.coef_build_time_of_dead = 1.0
         self._reinit()
 
     def _reinit(self) -> None:
@@ -541,6 +543,22 @@ class SpaceFleet(_BasicGameEntityArray):
             if isinstance(ss, Spaceship):
                 result += ss.build_time_of_dead
         return result
+
+    @property
+    def antirating(self) -> Union[float,int]:
+        """Antirating of dead spaceships.
+
+            return: result of sum of cost and build time of dead, each multiplied by it's coef (default is 1.0 for both).
+        """
+
+        cost_of_dead = 0
+        build_time_of_dead = 0
+        for ss in self:
+            if isinstance(ss, Spaceship):
+                cost_of_dead += ss.cost_of_dead
+                build_time_of_dead += ss.build_time_of_dead
+
+        return cost_of_dead * self.coef_cost_of_dead + build_time_of_dead * self.coef_build_time_of_dead
 
     @property
     def filtered_str(self) -> str:

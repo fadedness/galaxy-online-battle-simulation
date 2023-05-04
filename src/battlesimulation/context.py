@@ -717,6 +717,141 @@ class Context():
             elif isinstance(data, dict):
                 self._fleet_3.set_module_defense_damage_mods(data)
 
+    def set_fleet_1_elder_buff_attack(self):
+        """Sets elder attack bonus to 1.5 (+50%)"""
+
+        self._fleet_1.modules.elder_buff_attack()
+
+    def set_fleet_1_elder_debuff_attack(self):
+        """Sets elder attack bonus to 0.5 (-50%)"""
+
+        self._fleet_1.modules.elder_debuff_attack()
+
+    def reset_fleet_1_elder_attack(self):
+        """Sets elder attack bonus to 1.0 (+0%)"""
+
+        self._fleet_1.modules.reset_elder_attack()
+
+    def set_fleet_1_elder_buff_defense(self):
+        """Sets elder defense bonus to 1.5 (+50%)"""
+
+        self._fleet_1.modules.elder_buff_defense()
+
+    def set_fleet_1_elder_debuff_defense(self):
+        """Sets elder defense bonus to 0.5 (-50%)"""
+
+        self._fleet_1.modules.elder_debuff_defense()
+
+    def reset_fleet_1_elder_defense(self):
+        """Sets elder defense bonus to 1.0 (+0%)"""
+
+        self._fleet_1.modules.reset_elder_defense()
+
+    def set_fleet_1_elder_buff_speed(self):
+        """Sets elder speed bonus to 1.5 (+50%)"""
+
+        self._fleet_1.modules.elder_buff_speed()
+
+    def set_fleet_1_elder_debuff_speed(self):
+        """Sets elder speed bonus to 0.5 (-50%)"""
+
+        self._fleet_1.modules.elder_debuff_speed()
+
+    def reset_fleet_1_elder_speed(self):
+        """Sets elder speed bonus to 1.0 (+0%)"""
+
+        self._fleet_1.modules.reset_elder_speed()
+
+    def set_fleet_2_elder_buff_attack(self):
+        """Sets elder attack bonus to 1.5 (+50%)"""
+
+        self._fleet_2.modules.elder_buff_attack()
+
+    def set_fleet_2_elder_debuff_attack(self):
+        """Sets elder attack bonus to 0.5 (-50%)"""
+
+        self._fleet_2.modules.elder_debuff_attack()
+
+    def reset_fleet_2_elder_attack(self):
+        """Sets elder attack bonus to 1.0 (+0%)"""
+
+        self._fleet_2.modules.reset_elder_attack()
+
+    def set_fleet_2_elder_buff_defense(self):
+        """Sets elder defense bonus to 1.5 (+50%)"""
+
+        self._fleet_2.modules.elder_buff_defense()
+
+    def set_fleet_2_elder_debuff_defense(self):
+        """Sets elder defense bonus to 0.5 (-50%)"""
+
+        self._fleet_2.modules.elder_debuff_defense()
+
+    def reset_fleet_2_elder_defense(self):
+        """Sets elder defense bonus to 1.0 (+0%)"""
+
+        self._fleet_2.modules.reset_elder_defense()
+
+    def set_fleet_2_elder_buff_speed(self):
+        """Sets elder speed bonus to 1.5 (+50%)"""
+
+        self._fleet_2.modules.elder_buff_speed()
+
+    def set_fleet_2_elder_debuff_speed(self):
+        """Sets elder speed bonus to 0.5 (-50%)"""
+
+        self._fleet_2.modules.elder_debuff_speed()
+
+    def reset_fleet_2_elder_speed(self):
+        """Sets elder speed bonus to 1.0 (+0%)"""
+
+        self._fleet_2.modules.reset_elder_speed()
+
+    def set_fleet_3_elder_buff_attack(self):
+        """Sets elder attack bonus to 1.5 (+50%)"""
+
+        self._fleet_3.modules.elder_buff_attack()
+
+    def set_fleet_3_elder_debuff_attack(self):
+        """Sets elder attack bonus to 0.5 (-50%)"""
+
+        self._fleet_3.modules.elder_debuff_attack()
+
+    def reset_fleet_3_elder_attack(self):
+        """Sets elder attack bonus to 1.0 (+0%)"""
+
+        self._fleet_3.modules.reset_elder_attack()
+
+    def set_fleet_3_elder_buff_defense(self):
+        """Sets elder defense bonus to 1.5 (+50%)"""
+
+        self._fleet_3.modules.elder_buff_defense()
+
+    def set_fleet_3_elder_debuff_defense(self):
+        """Sets elder defense bonus to 0.5 (-50%)"""
+
+        self._fleet_3.modules.elder_debuff_defense()
+
+    def reset_fleet_3_elder_defense(self):
+        """Sets elder defense bonus to 1.0 (+0%)"""
+
+        self._fleet_3.modules.reset_elder_defense()
+
+    def set_fleet_3_elder_buff_speed(self):
+        """Sets elder speed bonus to 1.5 (+50%)"""
+
+        self._fleet_3.modules.elder_buff_speed()
+
+    def set_fleet_3_elder_debuff_speed(self):
+        """Sets elder speed bonus to 0.5 (-50%)"""
+
+        self._fleet_3.modules.elder_debuff_speed()
+
+    def reset_fleet_3_elder_speed(self):
+        """Sets elder speed bonus to 1.0 (+0%)"""
+
+        self._fleet_3.modules.reset_elder_speed()
+
     def set_planet(self, planet_type: int, planet_size: int, turrets_lvl: int = False) -> None:
         """Sets Planet's mandatory params.
 
